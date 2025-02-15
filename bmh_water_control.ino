@@ -51,7 +51,6 @@ const float volumeTotalTank3 = 12.33;
 const float volumeTotalTank4 = 12.33;
 
 // Water level thresholds (percentage)
-// Water level thresholds (percentage)
 const float thresholds1 = 75.0;  // 75%
 const float thresholds2 = 50.0;  // 50%
 const float thresholds3 = 25.0;  // 25%
@@ -108,53 +107,55 @@ void loop() {
 
   // Display the tank volumes and percentages on the LCD
   Display();
-
+  
+  //volume and percentage into one sentence and outputs it in the serial monitor.
+  DisplaySerial();
   // Check if any tank is below 75%, 50%, or 25% and send an SMS
     // Check Tank 1
     if (percentageTank1 <= thresholds3 && !lowWater25) {
-        sendSms(message, phoneNumbers[0]);
+        sendSms("Water level below 25% in Tank 1", phoneNumbers[0]);
         lowWater25 = true;  // Set flag to avoid repeating alert
     } else if (percentageTank1 <= thresholds2 && !lowWater50) {
-        sendSms(message, phoneNumbers[0]);
+        sendSms("Water level below 50% in Tank 1", phoneNumbers[0]);
         lowWater50 = true;
     } else if (percentageTank1 <= thresholds1 && !lowWater75) {
-        sendSms(message, phoneNumbers[0]);
+        sendSms("Water level below 75% in Tank 1", phoneNumbers[0]);
         lowWater75 = true;
     }
     
     // Check Tank 2
     if (percentageTank2 <= thresholds3 && !lowWater25) {
-        sendSms(message, phoneNumbers[1]);
+        sendSms("Water level below 25% in Tank 2", phoneNumbers[1]);
         lowWater25 = true;
     } else if (percentageTank2 <= thresholds2 && !lowWater50) {
-        sendSms(message, phoneNumbers[1]);
+        sendSms("Water level below 50% in Tank 2", phoneNumbers[1]);
         lowWater50 = true;
     } else if (percentageTank2 <= thresholds1 && !lowWater75) {
-        sendSms(message, phoneNumbers[1]);
+        sendSms("Water level below 75% in Tank 2", phoneNumbers[1]);
         lowWater75 = true;
     }
 
     // Check Tank 3
     if (percentageTank3 <= thresholds3 && !lowWater25) {
-        sendSms(message, phoneNumbers[2]);
+        sendSms("Water level below 25% in Tank 3", phoneNumbers[2]);
         lowWater25 = true;
     } else if (percentageTank3 <= thresholds2 && !lowWater50) {
-        sendSms(message, phoneNumbers[2]);
+        sendSms("Water level below 50% in Tank 3", phoneNumbers[2]);
         lowWater50 = true;
     } else if (percentageTank3 <= thresholds1 && !lowWater75) {
-        sendSms(message, phoneNumbers[2]);
+        sendSms("Water level below 75% in Tank 3", phoneNumbers[2]);
         lowWater75 = true;
     }
 
     // Check Tank 4
     if (percentageTank4 <= thresholds3 && !lowWater25) {
-        sendSms(message, phoneNumbers[3]);
+        sendSms("Water level below 25% in Tank 4", phoneNumbers[3]);
         lowWater25 = true;
     } else if (percentageTank4 <= thresholds2 && !lowWater50) {
-        sendSms(message, phoneNumbers[3]);
+        sendSms("Water level below 50% in Tank 4", phoneNumbers[3]);
         lowWater50 = true;
     } else if (percentageTank4 <= thresholds1 && !lowWater75) {
-        sendSms(message, phoneNumbers[3]);
+        sendSms("Water level below 75% in Tank 4", phoneNumbers[3]);
         lowWater75 = true;
     }
 
@@ -195,42 +196,42 @@ void Display() {
   Lcd.setCursor(0, 0);
   Lcd.print("Tank 1: Vol: ");
   Lcd.print(Volume1, 2);
-  Lcd.print("m^3: ");
-  Lcd.print(percentageTank1 * 100, 1);
+  Lcd.print(" m^3: ");
+  Lcd.print(percentageTank1, 1);
   Lcd.print("%");
 
   // Display Tank 2
   Lcd.setCursor(0, 1);
   Lcd.print("Tank 2: Vol: ");
   Lcd.print(Volume2, 2);
-  Lcd.print("m^3: ");
-  Lcd.print(percentageTank2 * 100, 1);
+  Lcd.print(" m^3: ");
+  Lcd.print(percentageTank2, 1);
   Lcd.print("%");
 
   // Display Tank 3
   Lcd.setCursor(0, 2);
   Lcd.print("Tank 3: Vol: ");
   Lcd.print(Volume3, 2);
-  Lcd.print("m^3: ");
-  Lcd.print(percentageTank3 * 100, 1);
+  Lcd.print(" m^3: ");
+  Lcd.print(percentageTank3, 1);
   Lcd.print("%");
 
   // Display Tank 4
   Lcd.setCursor(0, 3);
   Lcd.print("Tank 4: Vol: ");
   Lcd.print(Volume4, 2);
-  Lcd.print("m^3: ");
-  Lcd.print(percentageTank4 * 100, 1);
+  Lcd.print(" m^3: ");
+  Lcd.print(percentageTank4, 1);
   Lcd.print("%");
 }
 
 void sendWaterStatusSms(String alertType) {
   // Construct message
   String message = alertType + ":\n";
-  message += "Tank 1: Volume: " + String(Volume1, 3) + " m^3, " + String(percentageTank1 * 100, 2) + "%\n";
-  message += "Tank 2: Volume: " + String(Volume2, 3) + " m^3, " + String(percentageTank2 * 100, 2) + "%\n";
-  message += "Tank 3: Volume: " + String(Volume3, 3) + " m^3, " + String(percentageTank3 * 100, 2) + "%\n";
-  message += "Tank 4: Volume: " + String(Volume4, 3) + " m^3, " + String(percentageTank4 * 100, 2) + "%\n";
+  message += "Tank 1: Volume: " + String(Volume1, 3) + " m^3, " + String(percentageTank1, 2) + "%\n";
+  message += "Tank 2: Volume: " + String(Volume2, 3) + " m^3, " + String(percentageTank2, 2) + "%\n";
+  message += "Tank 3: Volume: " + String(Volume3, 3) + " m^3, " + String(percentageTank3, 2) + "%\n";
+  message += "Tank 4: Volume: " + String(Volume4, 3) + " m^3, " + String(percentageTank4, 2) + "%\n";
 
   // Loop through phone numbers to send SMS
   for (const String& number : phoneNumbers) {
@@ -261,4 +262,18 @@ void serialEvent() {
       sendWaterStatusSms("Water System Status");
     }
   }
+}
+
+void DisplaySerial() {
+  Serial.println("------------------------------------------");
+  Serial.println("Water Tank Status:");
+  // Tank 1
+  Serial.println("Tank 1: Volume: " + String(Volume1, 3) + " m^3, " + String(percentageTank1, 3) + "%");
+  // Tank 2
+  Serial.println("Tank 2: Volume: " + String(Volume2, 3) + " m^3, " + String(percentageTank2, 3) + "%");
+  // Tank 3
+  Serial.println("Tank 3: Volume: " + String(Volume3, 3) + " m^3, " + String(percentageTank3, 3) + "%");
+  // Tank 4
+  Serial.println("Tank 4: Volume: " + String(Volume4, 3) + " m^3, " + String(percentageTank4, 3) + "%");
+  Serial.println("------------------------------------------");
 }
