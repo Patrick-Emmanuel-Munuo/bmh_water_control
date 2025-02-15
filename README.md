@@ -125,17 +125,23 @@ void checkOverflowProtection() {
 
 ## Cost Breakdown
 
-### Material Costs
+REQUIRED WATER SYSTEM  CONTROLLER AT BLOCK I					
+#	NAME	UNIT	QTY	RATE	TOTAL
+1	Microcontroller	Pc	1	 100,000 	 100,000 
+2	Ultrasonic Sensors	Pc	5	 60,000 	 300,000 
+3	 Power Supply	Pc	1	 10,000 	 10,000 
+4	Connecting Wires	Pc	10	 50,000 	 500,000 
+5	PCB Circuit Board	Pc	1	 15,000 	 15,000 
+6	Water Proof Box	Pc	4	 30,000 	 120,000 
+7	LCD Display 	Pc	1	 60,000 	 60,000 
+8	GSM Moderm	Pc	1	 150,000 	 150,000 
+9	UTP CAT 6 Wires	m	300	 2,500 	 750,000 
+10	Conduit Pipe	Pc	100	 5,000 	 500,000 
+11	Battery and Charger	Pc	1	 100,000 	 100,000 
+12	Relay 	Pc	1	 30,000 	 30,000 
+13	Water Proof Glue 	Pc	6	 25,000 	 150,000 
+14	Voltage Regulator & Auxliariy Components	Pc	1	 25,000 	 25,000 
 
-| **Item**                          | **Quantity** | **Unit Cost** | **Total Cost** |
-|------------------------------------|--------------|---------------|----------------|
-| Microcontroller                    | 1            | 100,000       | 100,000        |
-| Ultrasonic Sensors                 | 5            | 60,000        | 300,000        |
-| Power Supply                       | 1            | 10,000        | 10,000         |
-| LCD Display                        | 1            | 60,000        | 60,000         |
-| GSM Module                         | 1            | 150,000       | 150,000        |
-| Battery and Charger                | 1            | 100,000       | 100,000        |
-| Other Components                   | —            | —             | 2,610,000      |
 
 ### **Total Material Cost**: 2,810,000  
 **VAT**: 505,800  
