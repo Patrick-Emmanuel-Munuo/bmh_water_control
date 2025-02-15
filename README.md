@@ -1,8 +1,8 @@
-Here’s a fresh `README.md` file, fully structured and with clear sections based on your project description:
+Here’s a fresh `README.md` file, fully structured and with clear sections based project description:
 
 ---
 
-# Water Level Monitoring and Alert System At Block I
+# Benjamin Mkapa Hospital(BMH) Water Level Monitoring and Alert System At Block I
 
 ## Overview
 
