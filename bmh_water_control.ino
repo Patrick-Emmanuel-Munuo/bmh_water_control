@@ -26,6 +26,18 @@ RTC_DS3231 rtc;
 const int water_pump1 = A5; //pump water from underground to ground tanks
 const int water_pump2 = A6; //pump water from ground to roof tanks
 
+// Overflow flags for each tank
+bool overflowFlagTank0 = false;
+bool overflowFlagTank1 = false;
+bool overflowFlagTank2 = false;
+bool overflowFlagTank3 = false;
+bool overflowFlagTank4 = false;
+bool overflowFlagTank5 = false;
+
+// Thresholds for overflow prevention
+const float criticalLevel = 95.0;  // Tank level at which overflow is at risk (95%)
+const float resetLevel = 90.0;     // Tank level at which overflow flag is reset (90%)
+
 
 
 const int sensor0_trigPin = 4;
@@ -135,12 +147,14 @@ void loop() {
   //volume and percentage into one sentence and outputs it in the serial monitor.
   DisplaySerial();
   // Check if any tank is below 75%, 50%, or 25% and send an SMS
-
-  // Check if any tank 90% send an SMS
-
+  //function();
+  
+  // Overflow Prevention
+  checkOverflowProtection();
+ 
   //condition for start the water water_pump1 pump water from underground to ground tanks
   //from V1 to V2,V3
-
+  
 
    //condition for start the water water_pump2 pump water from ground tanks to roof tanks
    //from V2,V3 to V0
@@ -261,4 +275,55 @@ void DisplaySerial() {
   Serial.println("Tank 4: Volume: " + String(Volume4, 3) + " m^3, " + String(percentageTank4, 3) + "%");
   Serial.println("Tank 5: Volume: " + String(Volume5, 3) + " m^3, " + String(percentageTank5, 3) + "%");
   Serial.println("------------------------------------------");
+}
+// Function to check overflow for each tank and send SMS
+
+void checkOverflowProtection() {
+  // Overflow Prevention Logic for Tank 0
+  if (percentageTank0 >= criticalLevel && !overflowFlagTank0) {
+    overflowFlagTank0 = true;  // Set overflow flag for Tank 0
+    sendWaterStatusSms("Tank 0 Overflow Risk! Level: " + String(percentageTank0) + "%");
+  } else if (percentageTank0 < resetLevel && overflowFlagTank0) {
+    overflowFlagTank0 = false;  // Reset overflow flag for Tank 0
+  }
+
+  // Overflow Prevention Logic for Tank 1
+  if (percentageTank1 >= criticalLevel && !overflowFlagTank1) {
+    overflowFlagTank1 = true;  // Set overflow flag for Tank 1
+    sendWaterStatusSms("Tank 1 Overflow Risk! Level: " + String(percentageTank1) + "%");
+  } else if (percentageTank1 < resetLevel && overflowFlagTank1) {
+    overflowFlagTank1 = false;  // Reset overflow flag for Tank 1
+  }
+
+  // Overflow Prevention Logic for Tank 2
+  if (percentageTank2 >= criticalLevel && !overflowFlagTank2) {
+    overflowFlagTank2 = true;  // Set overflow flag for Tank 2
+    sendWaterStatusSms("Tank 2 Overflow Risk! Level: " + String(percentageTank2) + "%");
+  } else if (percentageTank2 < resetLevel && overflowFlagTank2) {
+    overflowFlagTank2 = false;  // Reset overflow flag for Tank 2
+  }
+
+  // Overflow Prevention Logic for Tank 3
+  if (percentageTank3 >= criticalLevel && !overflowFlagTank3) {
+    overflowFlagTank3 = true;  // Set overflow flag for Tank 3
+    sendWaterStatusSms("Tank 3 Overflow Risk! Level: " + String(percentageTank3) + "%");
+  } else if (percentageTank3 < resetLevel && overflowFlagTank3) {
+    overflowFlagTank3 = false;  // Reset overflow flag for Tank 3
+  }
+
+  // Overflow Prevention Logic for Tank 4
+  if (percentageTank4 >= criticalLevel && !overflowFlagTank4) {
+    overflowFlagTank4 = true;  // Set overflow flag for Tank 4
+    sendWaterStatusSms("Tank 4 Overflow Risk! Level: " + String(percentageTank4) + "%");
+  } else if (percentageTank4 < resetLevel && overflowFlagTank4) {
+    overflowFlagTank4 = false;  // Reset overflow flag for Tank 4
+  }
+
+  // Overflow Prevention Logic for Tank 5
+  if (percentageTank5 >= criticalLevel && !overflowFlagTank5) {
+    overflowFlagTank5 = true;  // Set overflow flag for Tank 5
+    sendWaterStatusSms("Tank 5 Overflow Risk! Level: " + String(percentageTank5) + "%");
+  } else if (percentageTank5 < resetLevel && overflowFlagTank5) {
+    overflowFlagTank5 = false;  // Reset overflow flag for Tank 5
+  }
 }
