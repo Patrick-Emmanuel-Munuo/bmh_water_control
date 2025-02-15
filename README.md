@@ -11,7 +11,8 @@ The **Water Level Monitoring and Alert System** is designed to monitor and manag
 ## Features
 
 - **Real-Time Water Level Monitoring**: Monitors four tanks using ultrasonic sensors.
-- **SMS Alerts**: Sends alerts when water levels drop below 75%, 50%, or 25%.
+<span style="color:red;">- **SMS Alerts**: Sends alerts when water levels drop below 75%, 50%, or 25%..</span> 
+
 - **Scheduled Updates**: Sends daily updates at 7:00 AM and 6:30 PM.
 - **LCD Display**: Displays water levels in each tank in percentage and volume.
 - **SMS Command Functionality**: Responds to SMS requests for the water system status.
