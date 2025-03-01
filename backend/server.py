@@ -1,0 +1,143 @@
+import mysql.connector
+from flask import Flask, jsonify
+import random
+import threading
+import time
+import datetime
+from flask_cors import CORS  # Importing flask_cors to enable CORS
+
+# Initialize Flask app and Limiter
+app = Flask(__name__)
+CORS(app)  # Enable CORS for all routes
+
+# Pin Definitions for Ultrasonic Sensors and corresponding tank names (tanks as an array)
+tanks = [
+    {"unique_id": "67b17fce9e034bfffaa51f48", 'trig': 17, 'echo': 27, 'name': 'Main Tank', 'area': 0.2, 'empty_distance': 30, 'total_volume': 2100},
+    {"unique_id": "67b17fce9e034bfffaa51f49", 'trig': 22, 'echo': 23, 'name': 'Rainwater Tank', 'area': 0.25, 'empty_distance': 35, 'total_volume': 3262},
+    {"unique_id": "67b17fce9e034bfffaa51f50", 'trig': 24, 'echo': 25, 'name': 'Roof Tank 1', 'area': 0.3, 'empty_distance': 40, 'total_volume': 1445},
+    {"unique_id": "67b17fce9e034bfffaa51f51", 'trig': 5, 'echo': 6, 'name': 'Roof Tank 2', 'area': 0.35, 'empty_distance': 45, 'total_volume': 1668},
+    {"unique_id": "67b17fce9e034bfffaa51f52", 'trig': 13, 'echo': 19, 'name': 'Tank WTP1', 'area': 0.4, 'empty_distance': 50, 'total_volume': 2660},
+    {"unique_id": "67b17fce9e034bfffaa51f53", 'trig': 26, 'echo': 12, 'name': 'Tank WTP2', 'area': 0.5, 'empty_distance': 55, 'total_volume': 2665}
+]
+
+# MySQL Database connection
+def get_db_connection():
+    return mysql.connector.connect(
+        host="localhost",
+        user="root",         # Change to your MySQL username
+        password="",         # Change to your MySQL password
+        database="bmh_water_tank_data"
+    )
+
+# Function to get the water level parameters for each sensor (simulated)
+def get_tank_data(sensor_num):
+    try:
+        # Access tank data from the array
+        sensor = tanks[sensor_num]
+        empty_distance = sensor['empty_distance']
+        total_volume = sensor['total_volume']
+        area = sensor['area']
+        name = sensor['name']
+        unique_id = sensor['unique_id']
+        trig = sensor['trig']
+        echo = sensor['echo']
+        
+        # calculate water air gap height
+        height = random.uniform(0.0, 4.3)
+
+        # calculate water volume
+        volume = (empty_distance - height) * area
+        # calculate water percentage
+        percentage = ((total_volume - volume) / total_volume) * 100
+
+        # Return all the parameters in the desired format
+        return {
+            "empty_height": empty_distance,
+            "tank_name": name,
+            "height": height,
+            "water_level_percentage": percentage,
+            "tank_total_volume": total_volume,
+            "curent_water_volume": volume,
+            "tank_unique_id": unique_id
+        }
+
+    except Exception as e:
+        # Return structured error message if any error occurs
+        print(f"Error in get_tank_data for sensor {sensor_num}: {e}")
+        return {"success": False, "message": f"Error retrieving data for sensor {sensor_num}: {str(e)}"}
+
+# Function to insert data into MySQL every 60 seconds
+def insert_data_every_minute():
+    while True:
+        try:
+            connection = get_db_connection()
+            cursor = connection.cursor()
+
+            # Loop through each tank and insert the data
+            for sensor_num, tank_data in enumerate(tanks):
+                # Getting the data for each tank
+                tank_data = get_tank_data(sensor_num)
+                current_time = datetime.datetime.now()
+
+                # Prepare the SQL statement
+                query = """
+                    INSERT INTO tank_levels (name, unique_id, empty_height, height, percentage, total_volume, volume, created_date, updated_date)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                """
+                data = (
+                    tank_data['tank_name'], 
+                    tank_data['tank_unique_id'], 
+                    tank_data['empty_height'], 
+                    tank_data['height'], 
+                    tank_data['water_level_percentage'], 
+                    tank_data['tank_total_volume'], 
+                    tank_data['curent_water_volume'],
+                    current_time,  # created_date
+                    current_time   # updated_date
+                )
+                # Execute the SQL statement
+                cursor.execute(query, data)
+                connection.commit()
+            # Close cursor and connection
+            cursor.close()
+            connection.close()
+            print(f"Succesful insert data to the database at {current_time}")
+            # Wait for 60 seconds before inserting again
+            time.sleep(60)
+
+        except Exception as e:
+            print(f"Error in insert_data_every_minute: {e}")
+            time.sleep(60)
+
+# Start the data insertion thread
+insert_thread = threading.Thread(target=insert_data_every_minute, daemon=True)
+insert_thread.start()
+
+# Define the endpoint for retrieving water levels with rate limit
+@app.route('/water_levels', methods=['GET'])
+def get_water_levels():
+    try:
+        tank_data = []
+        for sensor_num in range(len(tanks)):  # Loop through the array length
+            tank_data.append(get_tank_data(sensor_num))  # Append each tank data to the list
+        
+        # Return the data in the requested format
+        return jsonify({
+            "success": True, 
+            "message": tank_data
+        })
+
+    except Exception as e:
+        # Return structured error message in case of failure
+        print(f"Error in get_water_levels: {e}")
+        return jsonify({
+            "success": False, 
+            "message": f"Failed to retrieve water levels: {str(e)}"
+        }), 500
+
+# Run the Flask app
+def run_flask_app():
+    app.run(host='0.0.0.0', port=5000, debug=False)
+
+if __name__ == "__main__":
+    run_flask_app()
