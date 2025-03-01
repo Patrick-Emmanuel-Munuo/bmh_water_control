@@ -120,6 +120,6 @@ function displayTankInfo(tankData) {
     });
 }
 
-// Fetch water levels every 10 seconds (setInterval)
-setInterval(fetchWaterLevels, 10000);  // 10000ms = 10 seconds
+// Fetch water levels every 60 seconds (setInterval)
+setInterval(fetchWaterLevels, 600000);  // 600000ms = 60 seconds
 window.onload = fetchWaterLevels;  // Fetch on initial load
