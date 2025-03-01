@@ -5,6 +5,8 @@ import threading
 import time
 import datetime
 from flask_cors import CORS  # Importing flask_cors to enable CORS
+import serial
+
 
 # Initialize Flask app and Limiter
 app = Flask(__name__)
@@ -19,6 +21,56 @@ tanks = [
     {"unique_id": "67b17fce9e034bfffaa51f52", 'trig': 13, 'echo': 19, 'name': 'Tank WTP1', 'area': 0.4, 'empty_distance': 50, 'total_volume': 2660},
     {"unique_id": "67b17fce9e034bfffaa51f53", 'trig': 26, 'echo': 12, 'name': 'Tank WTP2', 'area': 0.5, 'empty_distance': 55, 'total_volume': 2665}
 ]
+# Phone numbers array
+phone_numbers = [
+    "0625449295",  # hod water halab mushi
+    "0760449295",  # director TSEMU Assenga
+    "0775449295",  # water monitor person Tech Daniel
+    "0760449295",  # TSEMU kitengo Phone
+    "0760449295"   # ED BMH
+]
+
+# Serial communication setup for GSM module
+ser = serial.Serial('COM10', 9600)  # Replace with your GSM serial port
+ser.timeout = 1
+
+# Function to send SMS using GSM module
+def send_sms(text, number):
+    ser.write(b'AT\r')
+    time.sleep(0.5)
+    ser.write(b'AT+CMGF=1\r')  # Set SMS format to text
+    time.sleep(0.5)
+    ser.write(f'AT+CMGS="{number}"\r'.encode())  # Set recipient
+    time.sleep(0.5)
+    ser.write(text.encode())  # Send SMS body
+    time.sleep(0.5)
+    ser.write(bytes([26]))  # Send Ctrl+Z to indicate message end
+    time.sleep(1)
+    response = ser.read_all()
+    if b'OK' in response:
+        print(f"SMS sent successfully to {number}.")
+    else:
+        print(f"Failed to send SMS to {number}.")
+
+# Function to send water system status to all phone numbers
+def send_water_status_sms(message):
+    for number in phone_numbers:
+        send_sms(message, number)
+
+# Function to check and send SMS at scheduled times (7:00 AM and 6:30 PM)
+def check_and_send_sms():
+    while True:
+        current_time = datetime.datetime.now()
+        # Check if it's exactly 7:00 AM
+        if current_time.hour == 7 and current_time.minute == 0 and current_time.second == 0:
+            send_water_status_sms("Scheduled Morning Water System Status")
+            time.sleep(2)  # Wait for 60 seconds to prevent multiple messages in the same minute
+        # Check if it's exactly 6:30 PM
+        elif current_time.hour == 18 and current_time.minute == 30 and current_time.second == 0:
+            send_water_status_sms("Scheduled Evening Water System Status")
+            time.sleep(2)  # Wait for 60 seconds to prevent multiple messages in the same minute
+        # Sleep for 1 second to check the time more frequently
+        time.sleep(1)
 
 # MySQL Database connection
 def get_db_connection():
@@ -140,4 +192,13 @@ def run_flask_app():
     app.run(host='0.0.0.0', port=5000, debug=False)
 
 if __name__ == "__main__":
-    run_flask_app()
+    #run_flask_app()
+    flask_thread = threading.Thread(target=run_flask_app, daemon=True)
+    flask_thread.start()
+
+    sms_thread = threading.Thread(target=check_and_send_sms, daemon=True)
+    sms_thread.start()
+
+    # Keep the main thread alive to run both Flask and the SMS checking loop
+    while True:
+        time.sleep(1)
