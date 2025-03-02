@@ -151,8 +151,15 @@ function updateHeaderInfo(tanks) {
 
 // Update the title every second
 setInterval(function() {
-    // Update the chart title with current time
+    // Update the percentage chart title with current time
     chart.updateOptions({
+        title: {
+            text: `Water Tank Levels at ${new Date().toLocaleString()}` // Update title with current time
+        }
+    });
+
+    //update volume chart time at header
+    chart2.updateOptions({
         title: {
             text: `Water Tank Levels at ${new Date().toLocaleString()}` // Update title with current time
         }
