@@ -1,125 +1,102 @@
-// Function to fetch the water tank levels using fetch
-function fetchWaterLevels() {
-    document.getElementById('loading').style.display = 'block'; // Show loading
-
-    fetch('http://localhost:5000/water_levels')  // Flask API endpoint
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok ' + response.statusText);
+// Create the initial chart configuration
+let chart = new ApexCharts(document.querySelector("#chart"), {
+    chart: {
+        type: 'bar', // We can use bar chart to represent water levels
+        height: 400
+    },
+    series: [],
+    xaxis: {
+        categories: []
+    },
+    yaxis: {
+        labels: {
+            formatter: function (value) {
+                return value.toFixed(1) + "%";  // Format Y-axis labels with one decimal place
             }
-            return response.json();
-        })
+        }
+    },
+    title: {
+        text: 'Water Tank Levels',
+        align: 'center'
+    },
+    plotOptions: {
+        bar: {
+            horizontal: false,
+            columnWidth: '50%'
+        }
+    },
+    colors: ['#00A9E0', '#007D9F', '#005D7A', '#003D54', '#4C9FD7', '#006B8E'], // Water-like shades of blue
+    dataLabels: {
+        enabled: true,
+        formatter: function (val) {
+            return val.toFixed(1) + "%"; // Display percentage with 1 decimal place
+        }
+    }
+});
+
+// Render the initial chart
+chart.render();
+
+// Fetch water levels and update chart
+function fetchWaterLevels() {
+    fetch('http://localhost:5000/water_levels')  // Adjust the URL if needed
+        .then(response => response.json())
         .then(data => {
             if (data.success) {
-                displayGraph(data.message);
-                displayTankInfo(data.message);
+                updateChartData(data.message);
+                updateHeaderInfo(data.message);  // Update the header with total volume and average percentage
             } else {
-                console.error('Error fetching water levels:', data.message);
-                alert('Failed to fetch water levels.');
+                console.error('Failed to fetch water levels');
             }
         })
         .catch(error => {
-            console.error('API Error:', error);
-            alert('Failed to fetch water tank data. Please try again.');
-        })
-        .finally(() => {
-            document.getElementById('loading').style.display = 'none'; // Hide loading
+            console.error('Error fetching water levels:', error);
         });
 }
 
-// Function to display the water levels on the graph using ApexCharts
-function displayGraph(tankData) {
-    const tankNames = tankData.map(tank => tank.tank_name);
-    const waterLevels = tankData.map(tank => parseFloat(tank.water_level_percentage.toFixed(2)));
-
-    const options = {
-        series: [{
-            name: 'Water Level (%)',
-            data: waterLevels
-        }],
-        chart: {
-            type: 'bar',
-            height: 350,
-            background: '#f4f4f4'
-        },
-        title: {
-            text: 'Water Tank Levels (%)',
-            align: 'center',
-            style: {
-                fontSize: '24px',
-                fontWeight: 'bold',
-                color: '#1E90FF'
-            }
-        },
+// Update chart with new data
+function updateChartData(tanks) {
+    const tankNames = tanks.map(tank => tank.tank_name);
+    const tankLevels = tanks.map(tank => tank.water_level_percentage);
+    const volume = tanks.map(tank => tank.curent_water_volume);
+    // Update chart categories (x-axis)
+    chart.updateOptions({
         xaxis: {
             categories: tankNames,
-            title: {
-                text: 'Tanks'
-            },
-            labels: {
-                style: {
-                    fontSize: '14px',
-                    colors: ['#555']
-                }
-            }
-        },
-        yaxis: {
-            title: {
-                text: 'Water Level (%)'
-            },
-            max: 100,
-            min: 0,
-            tickAmount: 5
-        },
-        colors: ['#1E90FF'], // Water-like blue color
-        plotOptions: {
-            bar: {
-                horizontal: false,
-                columnWidth: '50%'
-            }
-        },
-        dataLabels: {
-            enabled: true,
-            style: {
-                fontSize: '14px',
-                colors: ['#fff']
-            },
-            formatter: function (value) {
-                return value.toFixed(2) + '%';  // Show percentage with 2 decimals
-            }
-        },
-        tooltip: {
-            y: {
-                formatter: function (val) {
-                    return val.toFixed(2) + '%';
-                }
-            }
         }
-    };
-
-    const chart = new ApexCharts(document.querySelector("#chart"), options);
-    chart.render();
-}
-
-// Function to display the tank information below the graph
-function displayTankInfo(tankData) {
-    const tankInfoContainer = document.getElementById('tankInfo');
-    tankInfoContainer.innerHTML = '';  // Clear any previous data
-
-    tankData.forEach(tank => {
-        const tankDiv = document.createElement('div');
-        tankDiv.classList.add('tank');
-        tankDiv.innerHTML = `
-            <h3>${tank.tank_name}</h3>
-            <p>Current Water Level: <span class="volume">${tank.water_level_percentage.toFixed(2)}%</span></p>
-            <p>Current Volume: <span class="volume">${tank.curent_water_volume.toFixed(2)}L</span></p>
-            <p>Total Volume: <span class="volume">${tank.tank_total_volume}L</span></p>
-            <p>Height: <span class="volume">${tank.height.toFixed(2)} m</span></p>
-        `;
-        tankInfoContainer.appendChild(tankDiv);
     });
+
+    // Update chart series (y-axis values)
+    chart.updateSeries([{
+        name: 'Water Level (%)',
+        data: tankLevels
+    }]);
 }
 
-// Fetch water levels every 60 seconds (setInterval)
-setInterval(fetchWaterLevels, 600000);  // 600000ms = 60 seconds
-window.onload = fetchWaterLevels;  // Fetch on initial load
+
+// Calculate and update the header info (Total Volume and Average Percentage)
+function updateHeaderInfo(tanks) {
+    let totalVolume = 0;
+    let totalPercentage = 0;
+    let totalTanks = tanks.length;
+
+    // Calculate total volume and average percentage
+    tanks.forEach(tank => {
+        totalVolume += tank.curent_water_volume;
+        totalPercentage += tank.water_level_percentage;
+    });
+
+    const averagePercentage = (totalPercentage / totalTanks).toFixed(2);  // Calculate average percentage with 1 decimal place
+
+    // Update the HTML elements
+    document.getElementById('total-volume').textContent = totalVolume.toFixed(2) + "L";
+    document.getElementById('average-percentage').textContent = averagePercentage;
+}
+
+
+
+// Initial fetch
+fetchWaterLevels();
+
+// Fetch the data every 10 seconds for real-time updates
+setInterval(fetchWaterLevels, 10000);

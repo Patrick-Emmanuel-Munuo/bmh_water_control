@@ -14,12 +14,12 @@ CORS(app)  # Enable CORS for all routes
 
 # Pin Definitions for Ultrasonic Sensors and corresponding tank names (tanks as an array)
 tanks = [
-    {"unique_id": "67b17fce9e034bfffaa51f48", 'trig': 17, 'echo': 27, 'name': 'Main Tank', 'area': 0.2, 'empty_distance': 30, 'total_volume': 2100},
-    {"unique_id": "67b17fce9e034bfffaa51f49", 'trig': 22, 'echo': 23, 'name': 'Rainwater Tank', 'area': 0.25, 'empty_distance': 35, 'total_volume': 3262},
-    {"unique_id": "67b17fce9e034bfffaa51f50", 'trig': 24, 'echo': 25, 'name': 'Roof Tank 1', 'area': 0.3, 'empty_distance': 40, 'total_volume': 1445},
-    {"unique_id": "67b17fce9e034bfffaa51f51", 'trig': 5, 'echo': 6, 'name': 'Roof Tank 2', 'area': 0.35, 'empty_distance': 45, 'total_volume': 1668},
-    {"unique_id": "67b17fce9e034bfffaa51f52", 'trig': 13, 'echo': 19, 'name': 'Tank WTP1', 'area': 0.4, 'empty_distance': 50, 'total_volume': 2660},
-    {"unique_id": "67b17fce9e034bfffaa51f53", 'trig': 26, 'echo': 12, 'name': 'Tank WTP2', 'area': 0.5, 'empty_distance': 55, 'total_volume': 2665}
+    {"unique_id": "67b17fce9e034bfffaa51f48", 'trig': 17, 'echo': 27, 'name': 'Main Tank', 'area': 32.2, 'empty_distance': 30, 'total_volume': 2100},
+    {"unique_id": "67b17fce9e034bfffaa51f49", 'trig': 22, 'echo': 23, 'name': 'Rainwater Tank', 'area': 20.25, 'empty_distance': 35, 'total_volume': 3262},
+    {"unique_id": "67b17fce9e034bfffaa51f50", 'trig': 24, 'echo': 25, 'name': 'Roof Tank 1', 'area': 40.3, 'empty_distance': 40, 'total_volume': 2445},
+    {"unique_id": "67b17fce9e034bfffaa51f51", 'trig': 5, 'echo': 6, 'name': 'Roof Tank 2', 'area': 30.35, 'empty_distance': 45, 'total_volume': 1668},
+    {"unique_id": "67b17fce9e034bfffaa51f52", 'trig': 13, 'echo': 19, 'name': 'Tank WTP1', 'area': 40.4, 'empty_distance': 50, 'total_volume': 2660},
+    {"unique_id": "67b17fce9e034bfffaa51f53", 'trig': 26, 'echo': 12, 'name': 'Tank WTP2', 'area': 34.5, 'empty_distance': 55, 'total_volume': 2665}
 ]
 # Phone numbers array
 phone_numbers = [
@@ -186,7 +186,47 @@ def get_water_levels():
             "success": False, 
             "message": f"Failed to retrieve water levels: {str(e)}"
         }), 500
+# Define the endpoint for retrieving read data in the database
+@app.route('/read', methods=['GET'])
+def read_data():
+    try:
+        data = []
+        table = "tank_levels"
+        connection = get_db_connection()
+        cursor = connection.cursor()
+        # Prepare the SQL statement
+        query = f"SELECT * FROM {table} ORDER BY created_date DESC"
+        # Execute the SQL statement
+        cursor.execute(query)
+        # Fetch all the data
+        records = cursor.fetchall()
+        # Loop through each record and append to the data list
+        for record in records:
+            data.append({
+                "id": record[0],
+                "name": record[1],
+                "unique_id": record[2],
+                "empty_height": record[3],
+                "height": record[4],
+                "percentage": record[5],
+                "total_volume": record[6],
+                "volume": record[7],
+                "created_date": record[8],
+                "updated_date": record[9]
+            })
+        # Return the data in the requested format
+        return jsonify({
+            "success": True, 
+            "message": data
+        })
 
+    except Exception as e:
+        # Return structured error message in case of failure
+        print(f"Error in read data in the database: {e}")
+        return jsonify({
+            "success": False, 
+            "message": f"Failed to retrieve read data in the database : {str(e)}"
+        }), 500
 # Run the Flask app
 def run_flask_app():
     app.run(host='0.0.0.0', port=5000, debug=False)

@@ -3,20 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Water Tank Levels</title>
-    <link rel="stylesheet" href="styles.css"> <!-- Linking the external CSS file -->
+    <meta name="description" content="Water Tank Levels Dashboard for BMH Block I">
+    <meta name="author" content="Your Name or Company">
+    <title>Water Tank Levels Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- ApexCharts CDN -->
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 </head>
 <body>
-    <h1>Water Tank Levels</h1>
-    <div id="chart"></div>
-    
-    <div class="tank-info" id="tankInfo">
-        <!-- Tank Info will be dynamically inserted here -->
+    <div class="container">
+        <header>
+            <h1>BMH Block I Water Tank Levels</h1>
+        </header>
+        
+        <section id="header-info" class="info-section">
+            <h3>Total Volume Available: <span id="total-volume">Loading...</span></h3>
+            <h3>Average Water Percentage: <span id="average-percentage">Loading...</span>%</h3>
+        </section>
+        
+        <section id="chart" class="chart-container"></section>  <!-- Chart container -->
+        <section id="charts" class="charts-container"></section>  <!-- Charts container -->
     </div>
-
-    <div id="loading" style="display:none;">Loading...</div> <!-- Loading Indicator -->
-
-    <script src="script.js"></script> <!-- Linking the external JS file -->
+    
+    <script src="script.js"></script>
 </body>
 </html>
