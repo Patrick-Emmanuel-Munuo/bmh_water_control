@@ -16,7 +16,7 @@ let chart = new ApexCharts(document.querySelector("#chart"), {
         }
     },
     title: {
-        text: `Water Tank Levels at ${new Date().toLocaleString()}`, // Display current date and time
+        text: `Water Tank Percentages Levels at ${new Date().toLocaleString()}`, // Display current date and time
         align: 'center'
     },
     plotOptions: {
@@ -33,9 +33,49 @@ let chart = new ApexCharts(document.querySelector("#chart"), {
         }
     }
 });
-
 // Render the initial chart
 chart.render();
+
+
+// Create the initial chart configuration
+let chart2 = new ApexCharts(document.querySelector("#chart2"), {
+    chart: {
+        type: 'bar', // We can use bar chart to represent water levels
+        height: 400
+    },
+    series: [],
+    xaxis: {
+        categories: []
+    },
+    yaxis: {
+        labels: {
+            formatter: function (value) {
+                return value.toFixed(1) + "m³";  // Format Y-axis labels with one decimal place
+            }
+        }
+    },
+    title: {
+        text: `Water Tanks Volume Levels at ${new Date().toLocaleString()}`, // Display current date and time
+        align: 'center'
+    },
+    plotOptions: {
+        bar: {
+            horizontal: false,
+            columnWidth: '50%'
+        }
+    },
+    colors: ['#00A9E0', '#007D9F', '#005D7A', '#003D54', '#4C9FD7', '#006B8E'], // Water-like shades of blue
+    dataLabels: {
+        enabled: true,
+        formatter: function (val) {
+            return val.toFixed(1) + "m³"; // Display percentage with 1 decimal place
+        }
+    }
+});
+
+// Render the initial chart
+chart2.render();
+
 
 // Fetch water levels and update chart
 function fetchWaterLevels() {
@@ -59,18 +99,34 @@ function updateChartData(tanks) {
     const tankNames = tanks.map(tank => tank.tank_name);
     const tankLevels = tanks.map(tank => tank.water_level_percentage);
     const volume = tanks.map(tank => tank.curent_water_volume);
+    //percentage chart
     // Update chart categories (x-axis)
     chart.updateOptions({
         xaxis: {
             categories: tankNames,
         }
     });
-
     // Update chart series (y-axis values)
     chart.updateSeries([{
         name: 'Water Level (%)',
         data: tankLevels
     }]);
+
+
+    //volume chart
+    // Update chart categories (x-axis)
+    chart2.updateOptions({
+        xaxis: {
+            categories: tankNames,
+        }
+    });
+    // Update chart series (y-axis values)
+    chart2.updateSeries([{
+        name: 'Water volume (m³)',
+        data: volume
+    }]);
+
+
 }
 
 
