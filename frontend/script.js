@@ -16,7 +16,7 @@ let chart = new ApexCharts(document.querySelector("#chart"), {
         }
     },
     title: {
-        text: 'Water Tank Levels',
+        text: `Water Tank Levels at ${new Date().toLocaleString()}`, // Display current date and time
         align: 'center'
     },
     plotOptions: {
@@ -89,12 +89,19 @@ function updateHeaderInfo(tanks) {
     const averagePercentage = (totalPercentage / totalTanks).toFixed(2);  // Calculate average percentage with 1 decimal place
 
     // Update the HTML elements
-    document.getElementById('total-volume').textContent = totalVolume.toFixed(2) + "L";
-    document.getElementById('average-percentage').textContent = averagePercentage;
+    document.getElementById('total-volume').textContent = totalVolume.toFixed(2) + " m³";
+    document.getElementById('average-percentage').textContent = averagePercentage + " %";
 }
 
-
-
+// Update the title every second
+setInterval(function() {
+    // Update the chart title with current time
+    chart.updateOptions({
+        title: {
+            text: `Water Tank Levels at ${new Date().toLocaleString()}` // Update title with current time
+        }
+    });
+}, 1000); // Update every second
 // Initial fetch
 fetchWaterLevels();
 
