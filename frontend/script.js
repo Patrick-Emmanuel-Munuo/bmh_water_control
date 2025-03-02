@@ -1,3 +1,4 @@
+
 function printDashboard() {
     // Temporarily hide the print button to prevent it from printing
     document.getElementById('print-button').style.display = 'none';
@@ -48,7 +49,7 @@ let chart = new ApexCharts(document.querySelector("#chart"), {
     yaxis: {
         labels: {
             formatter: function (value) {
-                return value.toFixed(1) + "%";  // Format Y-axis labels with one decimal place
+                return value.toFixed(1).toLocaleString() + "%";  // Format Y-axis labels with one decimal place
             }
         }
     },
@@ -59,14 +60,14 @@ let chart = new ApexCharts(document.querySelector("#chart"), {
     plotOptions: {
         bar: {
             horizontal: false,
-            columnWidth: '50%'
+            columnWidth: '60%'
         }
     },
     colors: ['#00A9E0', '#007D9F', '#005D7A', '#003D54', '#4C9FD7', '#006B8E'],//colors: ['#00A9E0', '#007D9F', '#005D7A', '#003D54', '#4C9FD7', '#006B8E'], // Water-like shades of blue
     dataLabels: {
         enabled: true,
         formatter: function (val) {
-            return val.toFixed(2) + "%"; // Display percentage with 1 decimal place
+            return val.toFixed(2).toLocaleString() + "%"; // Display percentage with 1 decimal place
         }
     }
 });
@@ -87,7 +88,7 @@ let chart2 = new ApexCharts(document.querySelector("#chart2"), {
     yaxis: {
         labels: {
             formatter: function (value) {
-                return value.toFixed(1) + "m³";  // Format Y-axis labels with one decimal place
+                return value.toFixed(1) + "Lt";  // Format Y-axis labels with one decimal place
             }
         }
     },
@@ -98,14 +99,14 @@ let chart2 = new ApexCharts(document.querySelector("#chart2"), {
     plotOptions: {
         bar: {
             horizontal: false,
-            columnWidth: '60%'
+            columnWidth: '75%'
         }
     },
     colors: ['#FF6347', '#FF4500', '#DC143C', '#B22222', '#8B0000', '#A52A2A'],//colors: ['#00A9E0', '#007D9F', '#005D7A', '#003D54', '#4C9FD7', '#006B8E'], // Water-like shades of blue
     dataLabels: {
         enabled: true,
         formatter: function (val) {
-            return val.toFixed(1) + "m³"; // Display percentage with 1 decimal place
+            return val.toFixed(1) + "Lt"; // Display percentage with 1 decimal place
         }
     }
 });
@@ -140,6 +141,12 @@ function updateChartData(tanks) {
     const tankNames = tanks.map(tank => tank.tank_name);
     const tankLevels = tanks.map(tank => tank.water_level_percentage);
     const volume = tanks.map(tank => tank.curent_water_volume);
+
+    // Format the tank levels and volume with commas
+    const formattedVolume = volume // Format volume values with commas
+    const formattedTankLevels = tankLevels.map(level => level.toFixed(2)); // Optionally, format tank levels to two decimals
+    
+    
     //percentage chart
     // Update chart categories (x-axis)
     chart.updateOptions({
@@ -163,8 +170,8 @@ function updateChartData(tanks) {
     });
     // Update chart series (y-axis values)
     chart2.updateSeries([{
-        name: 'Water volume (m³)',
-        data: volume
+        name: 'Water volume (Litres)',
+        data: formattedVolume
     }]);
 
 
@@ -184,9 +191,8 @@ function updateHeaderInfo(tanks) {
     });
 
     const averagePercentage = (totalPercentage / totalTanks).toFixed(2);  // Calculate average percentage with 1 decimal place
-
-    // Update the HTML elements
-    document.getElementById('total-volume').textContent = totalVolume.toFixed(2) + " m³";
+    // Update the HTML elements with the formatted numbers
+    document.getElementById('total-volume').textContent = totalVolume.toLocaleString() + " Litres";
     document.getElementById('average-percentage').textContent = averagePercentage + " %";
 }
 
@@ -211,16 +217,19 @@ setInterval(function() {
 // Initial fetch
 // Declare a variable to hold the interval reference
 let fetchInterval;
-
+let fetchInterval2;
 // Function to start fetching data at regular intervals
 function startFetching() {
     fetchWaterLevels(); // Fetch data immediately once
+    fetchWaterconsumption();
     fetchInterval = setInterval(fetchWaterLevels, 10000); // Fetch every 10 seconds
+    fetchInterval2 = setInterval(fetchWaterconsumption, 10000); // Fetch every 10 seconds
 }
 
 // Function to stop fetching data
 function stopFetching() {
     clearInterval(fetchInterval); // Clear the fetch interval
+    clearInterval(fetchInterval2); // Clear the fetch interval
 }
 
 // Listen for the visibilitychange event
