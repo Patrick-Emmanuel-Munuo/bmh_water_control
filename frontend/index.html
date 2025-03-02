@@ -10,7 +10,7 @@
     <!-- ApexCharts CDN -->
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 </head>
-<body>
+<body class="body">
     <div class="container">
         <header>
             <h1>BMH Block I Water Tank Levels</h1>
@@ -23,6 +23,12 @@
         <section id="chart" class="chart-container"></section>  <!-- percentage Chart container -->
         <section id="chart2" class="chart-container"></section>  <!-- Volume Chart container -->
         <!-- rander all six Charts -->
+        
+        <!-- Add a Print button at the bottom -->
+       <div class="print-container">
+            <button id="print-button" onclick="printDashboard()">Print Dashboard</button>
+        </div>
+
     </div>
     
     <script src="script.js"></script>

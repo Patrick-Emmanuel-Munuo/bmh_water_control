@@ -23,8 +23,8 @@ tanks = [
         "echo": 27,                             # Echo pin for ultrasonic sensor
         "name": 'Main Tank',                    # Name of the tank
         "area": 32.2,                           # Area of the tank (in m²)
-        "empty_distance": 30,                   # Distance at which the tank is considered empty (in cm)
-        "total_volume": 2100                    # Total volume of the tank (in liters)
+        "empty_distance": 450,                   # Distance at which the tank is considered empty (in cm)
+        "total_volume": 300000                    # Total volume of the tank (in liters)
     },
     {
         "unique_id": "67b17fce9e034bfffaa51f49",   # Unique identifier for the tank
@@ -32,26 +32,26 @@ tanks = [
         "echo": 23,                             # Echo pin for ultrasonic sensor
         "name": 'Rainwater Tank',                # Name of the tank
         "area": 20.25,                          # Area of the tank (in m²)
-        "empty_distance": 35,                   # Distance at which the tank is considered empty (in cm)
-        "total_volume": 3262                    # Total volume of the tank (in liters)
+        "empty_distance": 355,                   # Distance at which the tank is considered empty (in cm)
+        "total_volume": 726002                    # Total volume of the tank (in liters)
     },
     {
         "unique_id": "67b17fce9e034bfffaa51f50",   # Unique identifier for the tank
         "trig": 24,                             # Trigger pin for ultrasonic sensor
         "echo": 25,                             # Echo pin for ultrasonic sensor
         "name": 'Roof Tank 1',                   # Name of the tank
-        "area": 40.3,                           # Area of the tank (in m²)
-        "empty_distance": 40,                   # Distance at which the tank is considered empty (in cm)
-        "total_volume": 2445                    # Total volume of the tank (in liters)
+        "area": 60.3,                           # Area of the tank (in m²)
+        "empty_distance": 450,                   # Distance at which the tank is considered empty (in cm)
+        "total_volume": 240045                    # Total volume of the tank (in liters)
     },
     {
         "unique_id": "67b17fce9e034bfffaa51f51",   # Unique identifier for the tank
         "trig": 5,                              # Trigger pin for ultrasonic sensor
         "echo": 6,                              # Echo pin for ultrasonic sensor
         "name": 'Roof Tank 2',                   # Name of the tank
-        "area": 30.35,                          # Area of the tank (in m²)
-        "empty_distance": 45,                   # Distance at which the tank is considered empty (in cm)
-        "total_volume": 1668                    # Total volume of the tank (in liters)
+        "area": 40.35,                          # Area of the tank (in m²)
+        "empty_distance": 455,                   # Distance at which the tank is considered empty (in cm)
+        "total_volume": 160068                    # Total volume of the tank (in liters)
     },
     {
         "unique_id": "67b17fce9e034bfffaa51f52",   # Unique identifier for the tank
@@ -59,8 +59,8 @@ tanks = [
         "echo": 19,                             # Echo pin for ultrasonic sensor
         "name": 'Tank WTP1',                     # Name of the tank
         "area": 40.4,                           # Area of the tank (in m²)
-        "empty_distance": 50,                   # Distance at which the tank is considered empty (in cm)
-        "total_volume": 2660                    # Total volume of the tank (in liters)
+        "empty_distance": 550,                   # Distance at which the tank is considered empty (in cm)
+        "total_volume": 260060                    # Total volume of the tank (in liters)
     },
     {
         "unique_id": "67b17fce9e034bfffaa51f53",   # Unique identifier for the tank
@@ -68,8 +68,8 @@ tanks = [
         "echo": 12,                             # Echo pin for ultrasonic sensor
         "name": 'Tank WTP2',                     # Name of the tank
         "area": 34.5,                           # Area of the tank (in m²)
-        "empty_distance": 55,                   # Distance at which the tank is considered empty (in cm)
-        "total_volume": 2665                    # Total volume of the tank (in liters)
+        "empty_distance": 555,                   # Distance at which the tank is considered empty (in cm)
+        "total_volume": 260065                    # Total volume of the tank (in liters)
     }
 ]
 
@@ -161,12 +161,12 @@ def get_tank_data(sensor_num):
         echo = sensor['echo']
         
         # calculate water air gap height
-        height = random.uniform(0.0, 4.3)
+        height = random.uniform(229.0, 350.3)
 
-        # calculate water volume
-        volume = (empty_distance - height) * area
+        # calculate water volume/
+        volume = (((empty_distance - height)/100) * area)*1000
         # calculate water percentage
-        percentage = ((total_volume - volume) / total_volume) * 100
+        percentage = (volume / total_volume) * 100
 
         # Return all the parameters in the desired format
         return {
