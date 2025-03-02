@@ -31,7 +31,7 @@ tanks = [
         "trig": 22,                             # Trigger pin for ultrasonic sensor
         "echo": 23,                             # Echo pin for ultrasonic sensor
         "name": 'Rainwater Tank',                # Name of the tank
-        "area": 20.25,                          # Area of the tank (in m²)
+        "area": 40.25,                          # Area of the tank (in m²)
         "empty_distance": 355,                   # Distance at which the tank is considered empty (in cm)
         "total_volume": 726002                    # Total volume of the tank (in liters)
     },
