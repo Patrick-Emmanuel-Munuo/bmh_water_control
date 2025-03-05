@@ -5,17 +5,20 @@
     box-sizing: border-box;
 }
 
+/* Body Styling */
 body {
-    font-family: 'Roboto', sans-serif; /* More professional font */
-    background-color: #e9eff1; /* Soft background */
+    font-family: 'Roboto', sans-serif; /* Professional font */
+    background-color: #e9eff1; /* Soft background color for readability */
     display: flex;
     justify-content: center;
     align-items: center;
-   /*  height: 100vh; */
     flex-direction: column;
     color: #333;
+    min-height: 100vh; /* Ensure the body fills the screen */
+    padding: 20px; /* Add padding to prevent content from touching screen edges */
 }
 
+/* Container for Content */
 .container {
     background-color: #fff;
     padding: 30px;
@@ -27,18 +30,21 @@ body {
     box-sizing: border-box;
 }
 
+/* Header Styling */
 h1 {
     color: #2c3e50; /* Darker shade for the heading */
     font-size: 2.5rem;
     margin-bottom: 20px;
 }
 
+/* Subheader Styling */
 h3 {
     color: #555; /* Slightly lighter text color for subheadings */
     font-size: 1.2rem;
     margin-bottom: 10px;
 }
 
+/* Styling for Total Volume and Average Percentage */
 #header-info {
     margin-top: 10px;
 }
@@ -48,6 +54,7 @@ h3 {
     color: #3498db; /* Blue color for important information */
 }
 
+/* Chart Containers Styling */
 .chart-container {
     width: 100%;
     height: 400px;
@@ -56,7 +63,7 @@ h3 {
     overflow: hidden; /* Rounded corners for the chart */
 }
 
-/* Add button styles for potential future interaction */
+/* Button Styling */
 button {
     background-color: #3498db;
     color: white;
@@ -72,18 +79,7 @@ button:hover {
     background-color: #2980b9;
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-    .container {
-        padding: 20px;
-    }
-    h1 {
-        font-size: 2rem;
-    }
-    h3 {
-        font-size: 1rem;
-    }
-}
+/* Print Button Styling */
 .print-container {
     text-align: center;
     margin-top: 20px;
@@ -101,4 +97,73 @@ button:hover {
 
 #print-button:hover {
     background-color: #0056b3;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    /* Container Padding */
+    .container {
+        padding: 20px;
+    }
+    
+    /* Header Font Size */
+    h1 {
+        font-size: 2rem;
+    }
+
+    /* Subheader Font Size */
+    h3 {
+        font-size: 1rem;
+    }
+
+    /* Adjust chart height for mobile */
+    .chart-container {
+        height: 300px;
+    }
+
+    /* Adjust button padding for better touch experience */
+    button {
+        padding: 12px 25px;
+        font-size: 1.2rem;
+    }
+
+    /* Adjust print button size */
+    #print-button {
+        padding: 12px 25px;
+        font-size: 1.2rem;
+    }
+}
+
+/* Small Mobile Responsiveness (for very small screens) */
+@media (max-width: 480px) {
+    /* Reduce container padding */
+    .container {
+        padding: 15px;
+    }
+
+    /* Reduce font size for small screens */
+    h1 {
+        font-size: 1.5rem;
+    }
+
+    h3 {
+        font-size: 0.9rem;
+    }
+
+    /* Further adjust chart height */
+    .chart-container {
+        height: 250px;
+    }
+
+    /* Adjust button sizes for small screens */
+    button {
+        padding: 12px 30px;
+        font-size: 1.2rem;
+    }
+
+    /* Adjust print button size for mobile */
+    #print-button {
+        padding: 12px 30px;
+        font-size: 1.2rem;
+    }
 }

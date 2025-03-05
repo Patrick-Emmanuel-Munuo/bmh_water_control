@@ -1,4 +1,23 @@
+// Fetch water levels and update chart with try and catch
+async function fetchWaterLevels() {
+    try {
+        var url = 'http://192.168.11.241:5000/water_levels'; //192.168.11.241
 
+        const response = await fetch(url);
+        const data = await response.json();
+        if (data.success) {
+            console.log('succesfull fetching water levels: ');
+            updateChartData(data.message);
+            updateHeaderInfo(data.message);  // Update the header with total volume and average percentage
+        } else {
+            console.log('Error fetching water levels: ', data);
+            throw new Error('Failed to fetch water levels: ' + (data.message || 'Unknown error'));
+        }
+    } catch (error) {
+        // Log the error to the console
+        console.log('Error fetching water levels:', error);
+    }
+}
 function printDashboard() {
     // Temporarily hide the print button to prevent it from printing
     document.getElementById('print-button').style.display = 'none';
@@ -34,8 +53,6 @@ function printDashboard() {
     };
 }
 
-
-
 // Create the initial chart configuration
 let chart = new ApexCharts(document.querySelector("#chart"), {
     chart: {
@@ -54,7 +71,7 @@ let chart = new ApexCharts(document.querySelector("#chart"), {
         }
     },
     title: {
-        text: `Water Tank Percentages Levels at ${new Date().toLocaleString()}`, // Display current date and time
+        text: `Percentage Level Bar Graph`, // Display current date and time
         align: 'center'
     },
     plotOptions: {
@@ -66,6 +83,9 @@ let chart = new ApexCharts(document.querySelector("#chart"), {
     colors: ['#00A9E0', '#007D9F', '#005D7A', '#003D54', '#4C9FD7', '#006B8E'],//colors: ['#00A9E0', '#007D9F', '#005D7A', '#003D54', '#4C9FD7', '#006B8E'], // Water-like shades of blue
     dataLabels: {
         enabled: true,
+        style: {
+            colors: ['#333'] // Dark color for data labels to make them more visible
+        },
         formatter: function (val) {
             return val.toFixed(2).toLocaleString() + "%"; // Display percentage with 1 decimal place
         }
@@ -93,7 +113,7 @@ let chart2 = new ApexCharts(document.querySelector("#chart2"), {
         }
     },
     title: {
-        text: `Water Tanks Volume Levels at ${new Date().toLocaleString()}`, // Display current date and time
+        text: `Volume Level Bar Graph`, // Display current date and time
         align: 'center'
     },
     plotOptions: {
@@ -105,6 +125,9 @@ let chart2 = new ApexCharts(document.querySelector("#chart2"), {
     colors: ['#FF6347', '#FF4500', '#DC143C', '#B22222', '#8B0000', '#A52A2A'],//colors: ['#00A9E0', '#007D9F', '#005D7A', '#003D54', '#4C9FD7', '#006B8E'], // Water-like shades of blue
     dataLabels: {
         enabled: true,
+        style: {
+            colors: ['#333'] // Dark color for data labels to make them more visible
+        },
         formatter: function (val) {
             return val.toFixed(1) + "Lt"; // Display percentage with 1 decimal place
         }
@@ -113,28 +136,6 @@ let chart2 = new ApexCharts(document.querySelector("#chart2"), {
 
 // Render the initial chart
 chart2.render();
-
-
-// Fetch water levels and update chart with try and catch
-async function fetchWaterLevels() {
-    try {
-        var url = 'http://localhost:5000/water_levels';
-
-        const response = await fetch(url);
-        const data = await response.json();
-        if (data.success) {
-            console.log('succesfull fetching water levels: ');
-            updateChartData(data.message);
-            updateHeaderInfo(data.message);  // Update the header with total volume and average percentage
-        } else {
-            console.log('Error fetching water levels: ', data);
-            throw new Error('Failed to fetch water levels: ' + (data.message || 'Unknown error'));
-        }
-    } catch (error) {
-        // Log the error to the console
-        console.log('Error fetching water levels:', error);
-    }
-}
 
 // Update chart with new data
 function updateChartData(tanks) {
@@ -196,54 +197,12 @@ function updateHeaderInfo(tanks) {
     document.getElementById('average-percentage').textContent = averagePercentage + " %";
 }
 
-// Update the title every second
-setInterval(function() {
-    // Update the percentage chart title with current time
-    chart.updateOptions({
-        title: {
-            text: `Water Tank Prcentages Levels at ${new Date().toLocaleString()}` // Update title with current time
-        }
-    });
 
-    //update volume chart time at header
-    chart2.updateOptions({
-        title: {
-            text: `Water Tanks Volume Levels at ${new Date().toLocaleString()}` // Update title with current time
-        }
-    });
-}, 2000); // Update every second
-
-
-// Initial fetch
-// Declare a variable to hold the interval reference
-let fetchInterval;
-let fetchInterval2;
-// Function to start fetching data at regular intervals
+// Function to start periodic fetching of water levels
 function startFetching() {
-    fetchWaterLevels(); // Fetch data immediately once
-    fetchWaterconsumption();
-    fetchInterval = setInterval(fetchWaterLevels, 10000); // Fetch every 10 seconds
-    fetchInterval2 = setInterval(fetchWaterconsumption, 10000); // Fetch every 10 seconds
+    fetchWaterLevels();  // Fetch data immediately once
+    setInterval(fetchWaterLevels, 30000);  // Fetch data every 20 seconds
 }
 
-// Function to stop fetching data
-function stopFetching() {
-    clearInterval(fetchInterval); // Clear the fetch interval
-    clearInterval(fetchInterval2); // Clear the fetch interval
-}
-
-// Listen for the visibilitychange event
-document.addEventListener('visibilitychange', function() {
-    if (document.hidden) {
-        // Tab is inactive, stop fetching data
-        stopFetching();
-    } else {
-        // Tab is active, start fetching data
-        startFetching();
-    }
-});
-
-// Initial fetch when the page loads
-if (!document.hidden) {
-    startFetching(); // Only start fetching if the tab is active when the page loads
-}
+// Start the data fetching process as soon as the page loads
+startFetching();
