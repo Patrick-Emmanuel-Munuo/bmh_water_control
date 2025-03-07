@@ -1,9 +1,9 @@
 import mysql.connector
-from flask import Flask, jsonify
+from flask import Flask, jsonify,request
 import random
 import threading
 import time
-import datetime
+from datetime import datetime  # <-- correct import
 from flask_cors import CORS  # Importing flask_cors to enable CORS
 import serial
 
@@ -12,9 +12,18 @@ import serial
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
 
-# Pin Definitions for Ultrasonic Sensors and Corresponding Tank Details
+# Define the client ip adress as json in console
+@app.before_request
+def log_request_info():
+    try:
+        client_ip = request.remote_addr
+        now = datetime.now().strftime('%d/%b/%Y %H:%M:%S')
+        print(f'{client_ip} - - [{now}] "{request.method} {request.path} HTTP/1.1"')
+        # Log the request path and method
+    except Exception as e:
+        print(f"Error in log_request_info function: {e}")
 
-# Array holding the details of each tank
+# Pin Definitions for Ultrasonic Sensors and Corresponding Tank Details
 # Array holding the details of each tank
 tanks = [
     {
@@ -22,7 +31,7 @@ tanks = [
         "trig": 17,                             # Trigger pin for ultrasonic sensor
         "echo": 27,                             # Echo pin for ultrasonic sensor
         "name": 'Main Tank',                    # Name of the tank
-        "area": 32.2,                           # Area of the tank (in m²)
+        "area": 92.2,                           # Area of the tank (in m²)
         "empty_distance": 450,                   # Distance at which the tank is considered empty (in cm)
         "total_volume": 300000                    # Total volume of the tank (in liters)
     },
@@ -31,7 +40,7 @@ tanks = [
         "trig": 22,                             # Trigger pin for ultrasonic sensor
         "echo": 23,                             # Echo pin for ultrasonic sensor
         "name": 'Rainwater Tank',                # Name of the tank
-        "area": 40.25,                          # Area of the tank (in m²)
+        "area": 590.25,                          # Area of the tank (in m²)
         "empty_distance": 355,                   # Distance at which the tank is considered empty (in cm)
         "total_volume": 726002                    # Total volume of the tank (in liters)
     },
@@ -161,7 +170,7 @@ def get_tank_data(sensor_num):
         echo = sensor['echo']
         
         # calculate water air gap height
-        height = random.uniform(229.0, 350.3)
+        height = random.uniform(299.0, 250.3)
 
         # calculate water volume/
         volume = (((empty_distance - height)/100) * area)*1000
