@@ -6,6 +6,16 @@ import time
 from datetime import datetime  # <-- correct import
 from flask_cors import CORS  # Importing flask_cors to enable CORS
 import serial
+# import package
+import africastalking
+from dotenv import load_dotenv
+import os
+# Load .env file
+load_dotenv()
+
+# Initialize SDK
+username = "YOUR_USERNAME"  
+api_key = "YOUR_API_KEY"  
 
 
 # Initialize Flask app and Limiter
@@ -27,7 +37,7 @@ def log_request_info():
 # Array holding the details of each tank
 tanks = [
     {
-        "unique_id": "67b17fce9e034bfffaa51f48",   # Unique identifier for the tank
+        "unique_id": "T000",   # Unique identifier for the tank
         "trig": 17,                             # Trigger pin for ultrasonic sensor
         "echo": 27,                             # Echo pin for ultrasonic sensor
         "name": 'Main Tank',                    # Name of the tank
@@ -36,7 +46,7 @@ tanks = [
         "total_volume": 300000                    # Total volume of the tank (in liters)
     },
     {
-        "unique_id": "67b17fce9e034bfffaa51f49",   # Unique identifier for the tank
+        "unique_id": "T001",   # Unique identifier for the tank
         "trig": 22,                             # Trigger pin for ultrasonic sensor
         "echo": 23,                             # Echo pin for ultrasonic sensor
         "name": 'Rainwater Tank',                # Name of the tank
@@ -45,7 +55,7 @@ tanks = [
         "total_volume": 726002                    # Total volume of the tank (in liters)
     },
     {
-        "unique_id": "67b17fce9e034bfffaa51f50",   # Unique identifier for the tank
+        "unique_id": "T002",   # Unique identifier for the tank
         "trig": 24,                             # Trigger pin for ultrasonic sensor
         "echo": 25,                             # Echo pin for ultrasonic sensor
         "name": 'Roof Tank 1',                   # Name of the tank
@@ -54,7 +64,7 @@ tanks = [
         "total_volume": 240045                    # Total volume of the tank (in liters)
     },
     {
-        "unique_id": "67b17fce9e034bfffaa51f51",   # Unique identifier for the tank
+        "unique_id": "T003",   # Unique identifier for the tank
         "trig": 5,                              # Trigger pin for ultrasonic sensor
         "echo": 6,                              # Echo pin for ultrasonic sensor
         "name": 'Roof Tank 2',                   # Name of the tank
@@ -63,7 +73,7 @@ tanks = [
         "total_volume": 160068                    # Total volume of the tank (in liters)
     },
     {
-        "unique_id": "67b17fce9e034bfffaa51f52",   # Unique identifier for the tank
+        "unique_id": "T004",   # Unique identifier for the tank
         "trig": 13,                             # Trigger pin for ultrasonic sensor
         "echo": 19,                             # Echo pin for ultrasonic sensor
         "name": 'Tank WTP1',                     # Name of the tank
@@ -72,7 +82,7 @@ tanks = [
         "total_volume": 260060                    # Total volume of the tank (in liters)
     },
     {
-        "unique_id": "67b17fce9e034bfffaa51f53",   # Unique identifier for the tank
+        "unique_id": "T005",   # Unique identifier for the tank
         "trig": 26,                             # Trigger pin for ultrasonic sensor
         "echo": 12,                             # Echo pin for ultrasonic sensor
         "name": 'Tank WTP2',                     # Name of the tank
@@ -82,66 +92,83 @@ tanks = [
     }
 ]
 
-
 # Phone numbers array
 phone_numbers = [
-    "0625449295",  # hod water halab mushi
-    "0760449295",  # director TSEMU Assenga
-    "0775449295",  # water monitor person Tech Daniel
-    "0760449295",  # TSEMU kitengo Phone
-    "0760449295"   # ED BMH
+    "+255625449295",  # developer Eng Patrick Munuo
+   # "+255625449295",  # hod water Qs halab mushi
+   # "+255760449295",  # director TSEMU Frank Assenga
+   # "+255760449295",  # director Ag TSEMU Eng Mussa Kipende 
+   # "+255775449295",  # water monitor person Tech Daniel Wesaka
+    #"+255760449295",  # TSEMU kitengo Phonec\
+    #"+255760449295"   # ED BMH
 ]
 
-# Serial communication setup for GSM module
-ser = serial.Serial('COM10', 9600)  # Replace with your GSM serial port
-ser.timeout = 1
-
-# Function to send SMS using GSM module
-def send_sms(text, number):
-    try:
-        ser.write(b'AT\r')
-        time.sleep(0.5)
-        ser.write(b'AT+CMGF=1\r')  # Set SMS format to text
-        time.sleep(0.5)
-        ser.write(f'AT+CMGS="{number}"\r'.encode())  # Set recipient
-        time.sleep(0.5)
-        ser.write(text.encode())  # Send SMS body
-        time.sleep(0.5)
-        ser.write(bytes([26]))  # Send Ctrl+Z to indicate message end
-        time.sleep(1)
-        response = ser.read_all()
-        if b'OK' in response:
-            print(f"SMS sent successfully to {number}.")
-        else:
-            print(f"Failed to send SMS to {number}.")
-    except Exception as e:
-        print(f"Error in send_sms function: {e}")
-
-# Function to send water system status to all phone numbers
-def send_water_status_sms(message):
+ 
+# Function to send water system status using GSM module to all phone numbers
+def send_sms(message):
     try:
         for number in phone_numbers:
-            send_sms(message, number)
+         # Serial communication setup for GSM module
+         ser = serial.Serial('COM10', 9600)  # Replace with your GSM serial port
+         ser.timeout = 1
+         ser.write(b'AT\r')
+         time.sleep(0.5)
+         ser.write(b'AT+CMGF=1\r')  # Set SMS format to text
+         time.sleep(0.5)
+         ser.write(f'AT+CMGS="{number}"\r'.encode())  # Set recipient
+         time.sleep(0.5)
+         ser.write(message.encode())  # Send SMS body
+         time.sleep(0.5)
+         ser.write(bytes([26]))  # Send Ctrl+Z to indicate message end
+         time.sleep(1)
+         response = ser.read_all()
+         if b'OK' in response:
+            print(f"SMS sent successfully to {number}.")
+         else:
+            print(f"Failed to send SMS to {number}.")
     except Exception as e:
-        print(f"Error in send_water_status_sms function: {e}")
+        print(f"Error in send_sms via gsm function: {e}")
+
+
+# Function to send SMS using Africastalking
+def send_sms_africastalking(message):
+    try:
+        for number in phone_numbers:
+         # Initialize
+         username = os.getenv("AFRICAS_TALKING_USERNAME") or "sandbox"  # Use "sandbox" for development in the test environment
+         api_key = os.getenv("AFRICAS_TALKING_API_KEY") or "null"
+         sender_id = os.getenv("AFRICAS_TALKING_SENDER_ID") or "sandbox"  # Use "sandbox" for development in the test environment
+         print(f"username: {username}, api_key: {api_key}, sender_id: {sender_id}")
+        
+         # Initialize the SDK
+         africastalking.initialize(username, api_key)
+         # Initialize a service e.g. SMS
+         sms = africastalking.SMS
+         # # Use the service synchronously
+         response = sms.send(message, [number], sender_id)
+         # Initialize the SMS service
+         print(response)
+    except Exception as e:
+        print(f"Error in send smm via africastalking api function: {e}")  
 
 # Function to check and send SMS at scheduled times (7:00 AM and 6:30 PM)
 def check_and_send_sms():
     try:
         while True:
-            current_time = datetime.datetime.now()
+            current_time = datetime.now()
+            #print(f"Current time: {current_time}")
             # Check if it's exactly 7:00 AM
-            if current_time.hour == 7 and current_time.minute == 0 and current_time.second == 0:
-                send_water_status_sms("Scheduled Morning Water System Status")
+            if current_time.hour == 12 and current_time.minute == 45 and current_time.second == 0:
+                send_sms_africastalking(f"Morning Water Status at {current_time}/n")
                 time.sleep(2)  # Wait for 60 seconds to prevent multiple messages in the same minute
             # Check if it's exactly 6:30 PM
             elif current_time.hour == 18 and current_time.minute == 30 and current_time.second == 0:
-                send_water_status_sms("Scheduled Evening Water System Status")
+                send_sms_africastalking(f"Evening Water Status at {current_time}/n")
                 time.sleep(2)  # Wait for 60 seconds to prevent multiple messages in the same minute
             # Sleep for 1 second to check the time more frequently
             time.sleep(1)
     except Exception as e:
-        print(f"Error in check_and_send_sms function: {e}")
+        print(f"Error in check_and_send_sms scheduled Water Status function: {e}")
 
 # MySQL Database connection
 def get_db_connection():
@@ -211,7 +238,7 @@ def check_for_overflow():
                     # If the tank hasn't already been notified, send an SMS and update the flag
                     if not overflow_notified[tank_data["tank_unique_id"]]:
                         message = f"Warning: {tank_data['tank_name']} is overflowing! Current water level: {tank_data['water_level_percentage']}%"
-                        send_water_status_sms(message)  # Send the overflow notification via SMS
+                        send_sms(message)  # Send the overflow notification via SMS
                         overflow_notified[tank_data["tank_unique_id"]] = True  # Mark that we've notified for this tank
                         print(f"Overflow notification sent for {tank_data['tank_name']}.")
 
@@ -276,10 +303,15 @@ def insert_data_every_minute():
 insert_thread = threading.Thread(target=insert_data_every_minute, daemon=True)
 insert_thread.start()
 
+# Start the check_and_send_sms thread
+overflow_thread = threading.Thread(target=check_and_send_sms, daemon=True)
+overflow_thread.start()
+
 # Start the overflow checking thread
 overflow_thread = threading.Thread(target=check_for_overflow, daemon=True)
 overflow_thread.start()
-from datetime import timedelta
+
+#from datetime import timedelta
 
 # Function to calculate the water consumption average for day, week, and month
 def get_average_consumption():
@@ -392,7 +424,7 @@ def read_data():
 # Run the Flask app
 def run_flask_app():
     try:
-        app.run(host='0.0.0.0', port=5000, debug=False)
+        app.run(host='0.0.0.0', port=2010, debug=False)
     except Exception as e:
         print(f"Error in run_flask_app function: {e}")
 
@@ -402,8 +434,8 @@ if __name__ == "__main__":
         flask_thread = threading.Thread(target=run_flask_app, daemon=True)
         flask_thread.start()
 
-        sms_thread = threading.Thread(target=check_and_send_sms, daemon=True)
-        sms_thread.start()
+        #sms_thread = threading.Thread(target=check_and_send_sms, daemon=True)
+       # sms_thread.start()
 
         # Keep the main thread alive to run both Flask and the SMS checking loop
         while True:
