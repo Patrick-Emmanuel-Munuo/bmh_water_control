@@ -261,9 +261,7 @@ def insert_data_every_minute():
             if connection is None:
                 time.sleep(60)
                 continue
-            
             cursor = connection.cursor()
-
             # Loop through each tank and insert the data
             for sensor_num, tank_data in enumerate(tanks):
                 # Getting the data for each tank
@@ -293,11 +291,11 @@ def insert_data_every_minute():
             cursor.close()
             connection.close()
             print(f"Succesful insert data to the database at {current_time}")
-            # Wait for 60 seconds before inserting again
-            time.sleep(60)
+            # Wait for 30 minutes(1800seconds) before inserting again
+            time.sleep(1800)
     except Exception as e:
         print(f"Error in insert_data_every_minute function: {e}")
-        time.sleep(60)
+        time.sleep(360)
 
 # Start the data insertion thread
 insert_thread = threading.Thread(target=insert_data_every_minute, daemon=True)
